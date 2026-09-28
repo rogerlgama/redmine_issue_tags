@@ -1,0 +1,17 @@
+<h2><%= l(:label_issue_tag_collaborative_edit) %></h2>
+
+<%= labelled_form_for @tag,
+                      url: project_issue_tag_collaboration_path(@project, @tag),
+                      method: :patch do |f| %>
+  <%= error_messages_for @tag %>
+  <%= hidden_field_tag :issue_id, @return_issue&.id %>
+  <div class="box tabular">
+    <p><%= f.text_field :name, label: l(:label_issue_tag_name), required: true, size: 40 %></p>
+    <p><%= f.text_area :description, label: l(:label_issue_tag_description), rows: 5 %></p>
+    <p><%= f.color_field :color, label: l(:label_issue_tag_color), required: true %></p>
+  </div>
+  <%= submit_tag l(:button_save) %>
+  <%= link_to l(:button_cancel), @return_issue ? issue_path(@return_issue) : project_path(@project) %>
+<% end %>
+
+<p class="info"><%= l(:text_issue_tag_collaborative_limits) %></p>

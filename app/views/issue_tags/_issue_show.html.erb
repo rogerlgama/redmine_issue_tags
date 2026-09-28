@@ -1,0 +1,21 @@
+<% tags = RedmineIssueTags.tags_for(@issue).order(:name).to_a %>
+<% if tags.any? %>
+  <div class="issue-tags-display">
+    <span class="label"><%= l(:field_issue_tags) %>:</span>
+    <% tags.each do |tag| %>
+      <span class="issue-tag-with-edit">
+        <%= link_to tag.name,
+                    issues_path(set_filter: 1, f: ['issue_tags'], op: {issue_tags: '='}, v: {issue_tags: [tag.id]}),
+                    class: 'issue-tag-badge',
+                    title: tag.description.presence,
+                    style: "--tag-color: #{tag.color}" %>
+        <% if RedmineIssueTags.can_collaborate_tags?(User.current, @issue.project) %>
+          <%= link_to '',
+                      edit_project_issue_tag_collaboration_path(@issue.project, tag, issue_id: @issue.id),
+                      class: 'icon-only icon-edit issue-tag-edit-link',
+                      title: l(:label_issue_tag_collaborative_edit) %>
+        <% end %>
+      </span>
+    <% end %>
+  </div>
+<% end %>

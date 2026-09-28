@@ -1,0 +1,26 @@
+<%= error_messages_for @tag %>
+<div class="box tabular">
+  <p><%= f.text_field :name, label: l(:label_issue_tag_name), required: true, size: 40 %></p>
+  <p><%= f.text_field :color, label: l(:label_issue_tag_color), type: 'color', required: true %></p>
+  <p><%= f.text_area :description, label: l(:label_issue_tag_description), rows: 4 %></p>
+  <p class="issue-tag-trackers-field">
+    <label><%= l(:label_issue_tag_trackers) %><span class="required"> *</span></label>
+    <span class="issue-tag-tracker-picker" data-no-results="<%= l(:label_issue_tag_no_tracker_found) %>">
+      <input type="search"
+             class="issue-tag-tracker-search"
+             placeholder="<%= l(:label_issue_tag_search_trackers) %>"
+             autocomplete="off">
+      <span class="issue-tag-tracker-options">
+        <% selected_tracker_ids = @tag.tracker_ids.map(&:to_s) %>
+        <% Tracker.sorted.each do |tracker| %>
+          <label class="issue-tag-tracker-option" data-search-name="<%= tracker.name.mb_chars.downcase %>">
+            <%= check_box_tag 'redmine_issue_tag[tracker_ids][]', tracker.id, selected_tracker_ids.include?(tracker.id.to_s), id: "redmine_issue_tag_tracker_ids_#{tracker.id}" %>
+            <span><%= tracker.name %></span>
+          </label>
+        <% end %>
+        <span class="issue-tag-tracker-no-results"><%= l(:label_issue_tag_no_tracker_found) %></span>
+      </span>
+    </span>
+    <%= hidden_field_tag 'redmine_issue_tag[tracker_ids][]', '' %>
+  </p>
+</div>

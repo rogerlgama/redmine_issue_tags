@@ -1,0 +1,217 @@
+.issue-tag-badge {
+  --tag-color: #3b82f6;
+  display: inline-block;
+  margin: 1px 4px 1px 0;
+  padding: 2px 7px;
+  border: 1px solid var(--tag-color);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tag-color) 12%, white);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  text-decoration: none;
+}
+
+.issue-tag-badge:not(:hover):not(:active) {
+  color: #0f172a !important;
+}
+
+.issue-tag-badge:hover,
+.issue-tag-badge:active {
+  font-weight: 600;
+}
+
+.issue-tags-display { clear: both; margin: 10px 0; }
+.issue-tags-display .label { font-weight: bold; margin-right: 6px; }
+#issue-tags-field .info { display: block; margin-left: 180px; }
+
+.issue-tag-checkbox-options {
+  display: inline-block;
+  box-sizing: border-box;
+  width: min(520px, calc(100% - 190px));
+  min-width: 280px;
+  max-height: 150px;
+  overflow-y: auto;
+  vertical-align: top;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.issue-tag-checkbox-option {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 5px 8px !important;
+  float: none !important;
+  text-align: left !important;
+  cursor: pointer;
+}
+
+.issue-tag-checkbox-option:hover { background: #f3f6f8; }
+.issue-tag-checkbox-option input { margin: 0; }
+
+.issue-tag-tracker-picker,
+.issue-tag-role-picker {
+  display: inline-block;
+  width: min(520px, calc(100% - 190px));
+  vertical-align: top;
+}
+
+.issue-tag-tracker-search,
+.issue-tag-role-search {
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.issue-tag-tracker-options,
+.issue-tag-role-options {
+  display: block;
+  max-height: 138px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.issue-tag-tracker-option,
+.issue-tag-role-option {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 5px 8px !important;
+  float: none !important;
+  text-align: left !important;
+  cursor: pointer;
+}
+
+.issue-tag-tracker-option.issue-tag-filtered-out,
+.issue-tag-role-option.issue-tag-filtered-out {
+  display: none !important;
+}
+
+.issue-tag-tracker-option:hover,
+.issue-tag-role-option:hover { background: #f3f6f8; }
+.issue-tag-tracker-option input,
+.issue-tag-role-option input { margin: 0; }
+.issue-tag-tracker-no-results,
+.issue-tag-role-no-results { display: none; padding: 8px; color: #777; }
+
+.issue-tag-roles-settings { margin-bottom: 12px; }
+.issue-tag-roles-settings h3 { margin-top: 0; }
+.issue-tag-roles-settings > form > p:last-child { margin-bottom: 0; }
+.issue-tag-roles-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 28px;
+  align-items: stretch;
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+.issue-tag-role-search-column .issue-tag-role-picker {
+  display: block;
+  width: 100%;
+}
+.issue-tag-role-search-group + .issue-tag-role-search-group { margin-top: 18px; }
+.issue-tag-active-permissions {
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: #fff;
+}
+.issue-tag-active-permissions h4 {
+  margin: 0 0 8px;
+  font-weight: bold;
+  text-align: center;
+}
+.issue-tag-active-permission-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding-top: 8px;
+  border-top: 1px solid #ccc;
+}
+.issue-tag-active-permission-columns section + section {
+  padding-left: 18px;
+  border-left: 1px solid #ddd;
+}
+.issue-tag-active-permissions h5 { margin: 0 0 8px; }
+.issue-tag-active-permissions ul { margin: 0; padding-left: 18px; }
+.issue-tag-active-permissions .nodata { margin: 0; text-align: left; }
+.issue-tag-permissions-sync {
+  margin: 14px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+  color: #777;
+  text-align: center;
+}
+.issue-tag-roles-actions {
+  width: min(900px, 100%);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media screen and (max-width: 899px) {
+  .issue-tag-roles-layout { grid-template-columns: 1fr; }
+}
+
+@media screen and (max-width: 499px) {
+  .issue-tag-checkbox-options {
+    width: 100%;
+    min-width: 0;
+  }
+  #issue-tags-field .info { margin-left: 0; }
+  .issue-tag-active-permission-columns { grid-template-columns: 1fr; }
+  .issue-tag-active-permission-columns section + section {
+    padding-top: 12px;
+    padding-left: 0;
+    border-top: 1px solid #ddd;
+    border-left: 0;
+  }
+}
+
+.issue-tag-collaborative { margin-top: 6px; }
+.issue-tag-collaborative-form {
+  box-sizing: border-box;
+  margin: 6px 0 10px 0;
+  padding: 10px;
+  max-width: 715px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f7f7f7;
+}
+.issue-tag-collaborative-form p {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 24px;
+  padding-left: 0 !important;
+}
+.issue-tag-collaborative-form p > label {
+  position: static;
+  float: none;
+  flex: 0 0 160px;
+  box-sizing: border-box;
+  width: 160px;
+  margin: 4px 4px 0 0;
+  text-align: right;
+}
+.issue-tag-collaborative-form input[type="text"],
+.issue-tag-collaborative-form textarea {
+  box-sizing: border-box;
+  width: min(500px, calc(100% - 170px));
+}
+.issue-tag-collaborative-form input[type="color"] { flex: 0 0 auto; }
+.issue-tag-collaborative-status { margin-left: 8px; }
+.issue-tag-collaborative-status.success { color: #16813b; }
+.issue-tag-collaborative-status.error { color: #b42318; }
+.issue-tag-with-edit { display: inline-flex; align-items: center; margin-right: 3px; }
+.issue-tag-edit-link { margin-left: -3px; }

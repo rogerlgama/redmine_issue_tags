@@ -1,0 +1,123 @@
+<div class="contextual">
+  <%= link_to l(:label_issue_tag_new), new_issue_tag_path, class: 'icon icon-add' %>
+  <%= link_to l(:label_issue_tag_roles),
+              '#issue-tag-roles-settings',
+              class: 'icon icon-user issue-tag-roles-toggle',
+              data: {issue_tag_roles_toggle: true} %>
+</div>
+<h2><%= l(:label_issue_tags) %></h2>
+
+<div id="issue-tag-roles-settings" class="box issue-tag-roles-settings" hidden>
+  <h3><%= l(:label_issue_tag_roles) %></h3>
+  <%= form_tag issue_tag_roles_path, method: :patch do %>
+    <div class="issue-tag-roles-layout">
+      <div class="issue-tag-role-search-column">
+        <div class="issue-tag-role-search-group">
+          <span class="issue-tag-role-picker"
+                data-active-role-target="collaborative"
+                data-no-results="<%= l(:label_issue_tag_no_role_found) %>">
+            <input type="search"
+                   class="issue-tag-role-search"
+                   placeholder="<%= l(:label_issue_tag_search_roles) %>"
+                   autocomplete="off">
+            <span class="issue-tag-role-options">
+              <% @roles.each do |role| %>
+                <label class="issue-tag-role-option" data-search-name="<%= role.name.mb_chars.downcase %>">
+                  <%= check_box_tag 'collaborative_role_ids[]', role.id, @collaborative_role_ids.include?(role.id), id: "issue_tag_collaborative_role_ids_#{role.id}" %>
+                  <span><%= role.name %></span>
+                </label>
+              <% end %>
+              <span class="issue-tag-role-no-results"><%= l(:label_issue_tag_no_role_found) %></span>
+            </span>
+          </span>
+          <%= hidden_field_tag 'collaborative_role_ids[]', '' %>
+        </div>
+
+        <div class="issue-tag-role-search-group">
+          <span class="issue-tag-role-picker"
+                data-active-role-target="assignment"
+                data-no-results="<%= l(:label_issue_tag_no_role_found) %>">
+            <input type="search"
+                   class="issue-tag-role-search"
+                   placeholder="<%= l(:label_issue_tag_search_assignment_roles) %>"
+                   autocomplete="off">
+            <span class="issue-tag-role-options">
+              <% @roles.each do |role| %>
+                <label class="issue-tag-role-option" data-search-name="<%= role.name.mb_chars.downcase %>">
+                  <%= check_box_tag 'assignment_role_ids[]', role.id, @assignment_role_ids.include?(role.id), id: "issue_tag_assignment_role_ids_#{role.id}" %>
+                  <span><%= role.name %></span>
+                </label>
+              <% end %>
+              <span class="issue-tag-role-no-results"><%= l(:label_issue_tag_no_role_found) %></span>
+            </span>
+          </span>
+          <%= hidden_field_tag 'assignment_role_ids[]', '' %>
+        </div>
+      </div>
+      <div class="issue-tag-active-permissions">
+        <h4><%= l(:label_issue_tag_active_permission) %></h4>
+        <div class="issue-tag-active-permission-columns">
+          <section data-active-role-list="collaborative">
+            <h5><%= l(:label_issue_tag_create_edit) %></h5>
+            <ul>
+              <% @collaborative_roles.each do |role| %>
+                <li><%= role.name %></li>
+              <% end %>
+            </ul>
+            <p class="nodata"<%= ' hidden' if @collaborative_roles.any? %>><%= l(:label_issue_tag_no_active_permission) %></p>
+          </section>
+          <section data-active-role-list="assignment">
+            <h5><%= l(:label_issue_tag_add_remove) %></h5>
+            <ul>
+              <% @assignment_roles.each do |role| %>
+                <li><%= role.name %></li>
+              <% end %>
+            </ul>
+            <p class="nodata"<%= ' hidden' if @assignment_roles.any? %>><%= l(:label_issue_tag_no_active_permission) %></p>
+          </section>
+        </div>
+        <p class="issue-tag-permissions-sync"><%= l(:text_issue_tag_permissions_sync) %></p>
+      </div>
+    </div>
+    <p class="issue-tag-roles-actions">
+      <%= submit_tag l(:button_save) %>
+      <button type="button" class="issue-tag-roles-cancel"><%= l(:button_cancel) %></button>
+    </p>
+  <% end %>
+</div>
+
+<% if @tags.any? %>
+  <div class="autoscroll">
+    <table class="list issue-tags-admin">
+      <thead><tr>
+        <th><%= l(:label_issue_tag_name) %></th>
+        <th><%= l(:label_issue_tag_description) %></th>
+        <th><%= l(:label_issue_tag_used_by) %></th>
+        <th><%= l(:label_issue_tag_issue_count) %></th>
+        <th></th>
+      </tr></thead>
+      <tbody>
+        <% @tags.each do |tag| %>
+          <tr>
+            <td>
+              <%= link_to tag.name,
+                          issues_path(set_filter: 1, f: ['issue_tags'], op: {issue_tags: '='}, v: {issue_tags: [tag.id]}),
+                          class: 'issue-tag-badge',
+                          title: tag.description.presence,
+                          style: "--tag-color: #{tag.color}" %>
+            </td>
+            <td><%= tag.description %></td>
+            <td><%= tag.trackers.sort_by(&:position).map(&:name).join(', ').presence || '-' %></td>
+            <td><%= tag.taggings.size %></td>
+            <td class="buttons">
+              <%= link_to l(:button_edit), edit_issue_tag_path(tag), class: 'icon icon-edit' %>
+              <%= delete_link issue_tag_path(tag) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>

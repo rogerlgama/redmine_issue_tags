@@ -1,0 +1,56 @@
+<% if RedmineIssueTags.database_ready? && @issue && @issue.project && RedmineIssueTags.can_assign_tags?(User.current, @issue.project) %>
+  <% selected_ids = RedmineIssueTags.tag_ids_for(@issue).map(&:to_s) %>
+  <p id="issue-tags-field">
+    <label><%= l(:field_issue_tags) %></label>
+    <%= hidden_field_tag 'redmine_issue_tag_ids[]', '' %>
+    <% available_tags = RedmineIssueTag.active.joins(:trackers).where(trackers: {id: @issue.tracker_id}).sorted %>
+    <span id="redmine_issue_tag_options" class="issue-tag-checkbox-options">
+      <% available_tags.each do |tag| %>
+        <label class="issue-tag-checkbox-option"
+               data-issue-tag-id="<%= tag.id %>"
+               title="<%= tag.description.presence %>">
+          <%= check_box_tag 'redmine_issue_tag_ids[]',
+                            tag.id,
+                            selected_ids.include?(tag.id.to_s),
+                            id: "redmine_issue_tag_ids_#{tag.id}" %>
+          <span><%= tag.name %></span>
+        </label>
+      <% end %>
+    </span>
+    <em class="info"><%= l(:text_issue_tags_select_help) %></em>
+  </p>
+
+  <% if RedmineIssueTags.can_collaborate_tags?(User.current, @issue.project) %>
+    <div class="issue-tag-collaborative"
+         data-create-url="<%= project_issue_tag_collaborations_path(@issue.project) %>"
+         data-success-message="<%= l(:notice_issue_tag_collaborative_created) %>"
+         data-error-message="<%= l(:error_issue_tag_collaborative_create) %>">
+      <p>
+        <label></label>
+        <button type="button" class="button-small issue-tag-collaborative-toggle icon icon-add">
+          <%= l(:label_issue_tag_create_from_issue) %>
+        </button>
+      </p>
+      <div class="issue-tag-collaborative-form" hidden>
+        <p>
+          <label for="collaborative_issue_tag_name"><%= l(:label_issue_tag_name) %><span class="required"> *</span></label>
+          <input type="text" id="collaborative_issue_tag_name" maxlength="80">
+        </p>
+        <p>
+          <label for="collaborative_issue_tag_description"><%= l(:label_issue_tag_description) %></label>
+          <textarea id="collaborative_issue_tag_description" rows="3"></textarea>
+        </p>
+        <p>
+          <label for="collaborative_issue_tag_color"><%= l(:label_issue_tag_color) %></label>
+          <input type="color" id="collaborative_issue_tag_color" value="#3b82f6">
+        </p>
+        <p>
+          <label></label>
+          <button type="button" class="issue-tag-collaborative-submit"><%= l(:button_create) %></button>
+          <button type="button" class="issue-tag-collaborative-cancel"><%= l(:button_cancel) %></button>
+          <span class="issue-tag-collaborative-status"></span>
+        </p>
+      </div>
+    </div>
+  <% end %>
+<% end %>

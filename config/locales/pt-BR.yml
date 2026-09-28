@@ -1,0 +1,52 @@
+pt-BR:
+  label_issue_tags: "Tags"
+  label_issue_tag_new: "Nova tag"
+  label_issue_tag_edit: "Editar tag"
+  field_issue_tags: "Tags"
+  field_color: "Cor"
+  label_issue_tag_name: "Nome"
+  label_issue_tag_color: "Cor"
+  label_issue_tag_description: "Descrição"
+  label_issue_tag_trackers: "Tipos de tarefa"
+  label_issue_tag_used_by: "Tarefas vinculadas"
+  label_issue_tag_issue_count: "Nº de Tarefas"
+  label_issue_tag_search_trackers: "Pesquisar tipos de tarefa..."
+  label_issue_tag_no_tracker_found: "Nenhum tipo de tarefa encontrado"
+  label_issue_tag_roles: "Perfis"
+  label_issue_tag_active_permission: "Permissão ativa"
+  label_issue_tag_create_edit: "Criar/Editar"
+  label_issue_tag_add_remove: "Adicionar/Remover"
+  label_issue_tag_no_active_permission: "Nenhum perfil selecionado"
+  label_issue_tag_search_roles: "Perfis autorizados a criar/editar tags..."
+  label_issue_tag_search_assignment_roles: "Perfis autorizados a adicionar/remover tags..."
+  label_issue_tag_no_role_found: "Nenhum perfil encontrado"
+  text_issue_tag_permissions_sync: "As edições realizadas nesta página são sincronizadas com o menu Papéis e permissões"
+  permission_edit_issue_tags: "Adicionar e remover tags das tarefas"
+  permission_collaborate_issue_tags: "Criar e editar tags diretamente nas tarefas"
+  label_issue_tag_create_from_issue: "Criar tag"
+  label_issue_tag_collaborative_edit: "Editar tag"
+  notice_issue_tag_collaborative_created: "Tag criada e selecionada. Salve a tarefa para concluir a vinculação."
+  error_issue_tag_collaborative_create: "Não foi possível criar a tag."
+  text_issue_tag_collaborative_limits: "Na edição colaborativa é permitido alterar Nome, Descrição e Cor. Tipos de tarefa e deleções são restritos aos administradores."
+  text_issue_tags_select_help: "Marque ou desmarque as tags desejadas."
+  error_issue_tag_in_use: "A tag não pode ser excluída porque está vinculada a tarefas. Remova os vínculos primeiro."
+  error_issue_tags_database_not_ready: "As tabelas do plugin de tags ainda não estão disponíveis. Execute a migração do plugin e reinicie o Redmine."
+  error_issue_tag_not_found: "Tag não encontrada."
+  error_issue_tag_issue_not_found: "Tarefa não encontrada ou não visível."
+  activerecord:
+    attributes:
+      redmine_issue_tag:
+        name: "Nome"
+        normalized_name: "Nome"
+        color: "Cor"
+        description: "Descrição"
+        trackers: "Tipos de tarefa"
+        roles: "Perfis"
+    errors:
+      models:
+        redmine_issue_tag:
+          attributes:
+            name:
+              taken: "não está disponível"
+            trackers:
+              blank: "deve possuir pelo menos um tipo de tarefa"
