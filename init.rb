@@ -5,7 +5,7 @@ require_relative 'lib/redmine_issue_tags'
 Redmine::Plugin.register :redmine_issue_tags do
   name 'Redmine Issue Tags'
   author 'Roger Gama'
-  author_url 'https://github.com/rogerlgama/redmine_issue_tags'
+  author_url 'https://github.com/rogerlgama'
   description 'Tags pesquisáveis para tarefas do Redmine'
   version '0.5.2'
   url 'https://github.com/rogerlgama/redmine_issue_tags'

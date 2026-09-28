@@ -330,4 +330,4 @@ Este projeto é distribuído sob a GNU General Public License versão 2 ou, opci
 
 ## Autor
 
-[Roger Gama](https://github.com/rogerlgama/redmine_issue_tags)
+[Roger Gama](https://github.com/rogerlgama)

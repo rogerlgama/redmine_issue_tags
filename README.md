@@ -150,4 +150,4 @@ Copyright holders license this project under the GNU General Public License vers
 
 ## Author
 
-[Roger Gama](https://github.com/rogerlgama/redmine_issue_tags)
+[Roger Gama](https://github.com/rogerlgama)
