@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   package:
@@ -43,3 +43,32 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 90
+
+      - name: Build release archive
+        id: archive
+        shell: bash
+        run: |
+          version="${{ steps.metadata.outputs.version }}"
+          archive="$RUNNER_TEMP/redmine_issue_tags-$version.zip"
+          cd "$RUNNER_TEMP/redmine_issue_tags-package"
+          zip -rq "$archive" redmine_issue_tags
+          echo "path=$archive" >> "$GITHUB_OUTPUT"
+
+      - name: Publish versioned release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          version="${{ steps.metadata.outputs.version }}"
+          tag="v$version"
+          archive="${{ steps.archive.outputs.path }}"
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; keeping its published package."
+          else
+            gh release create "$tag" "$archive" \
+              --target "$GITHUB_SHA" \
+              --title "Redmine Issue Tags $version" \
+              --notes "Pacote instalável do Redmine Issue Tags $version."
+          fi
