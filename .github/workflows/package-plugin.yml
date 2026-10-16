@@ -1,0 +1,45 @@
+name: Package plugin
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Read plugin version
+        id: metadata
+        shell: bash
+        run: |
+          version="$(sed -n "s/.*version '\([^']*\)'.*/\1/p" init.rb | head -n 1)"
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare installable directory
+        shell: bash
+        run: |
+          package_root="$RUNNER_TEMP/redmine_issue_tags-package"
+          mkdir -p "$package_root/redmine_issue_tags"
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            ./ "$package_root/redmine_issue_tags/"
+
+      - name: Upload plugin package
+        uses: actions/upload-artifact@v4
+        with:
+          name: redmine_issue_tags-${{ steps.metadata.outputs.version }}
+          path: ${{ runner.temp }}/redmine_issue_tags-package
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
