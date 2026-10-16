@@ -1,6 +1,14 @@
-# Redmine Issue Tags 0.5.2
+# Redmine Issue Tags 0.5.3
 
 Plugin de tags pesquisáveis para tarefas, desenvolvido para testes no Redmine 6.0.6.
+
+## Correção da versão 0.5.3
+
+- reinicializa automaticamente os controles de tags quando o Redmine atualiza dinamicamente o formulário;
+- mantém o botão `Criar tag` funcional após a troca do tipo de tarefa;
+- permite a criação colaborativa de tags para qualquer tipo de tarefa disponível no projeto.
+
+Esta versão não possui nova migração.
 
 ## Melhoria da versão 0.5.2
 

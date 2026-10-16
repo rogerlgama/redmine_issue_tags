@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## 0.5.3
+
+- Reinicializa automaticamente os controles de tags após atualizações dinâmicas do formulário de tarefa.
+- Mantém o botão `Criar tag` funcional ao trocar para qualquer tipo de tarefa disponível.
+- Preserva a compatibilidade com o carregamento inicial e com a navegação Turbo.
+
 ## 0.5.2
 
 - Inclui `issue_tags` nas respostas JSON padrão de `GET /issues/:id.json` e `GET /issues.json`.

@@ -49,7 +49,7 @@ The plugin was developed and validated for Redmine 6.0.6.
 3. Run the migration command shown above.
 4. Restart Redmine.
 
-Version 0.5.2 does not add a new migration. Installations upgrading from versions older than 0.4.11 must still run all pending plugin migrations.
+Version 0.5.3 does not add a new migration. Installations upgrading from versions older than 0.4.11 must still run all pending plugin migrations.
 
 ## Permissions
 

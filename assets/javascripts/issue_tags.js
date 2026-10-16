@@ -215,6 +215,36 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', initializeAll);
-  document.addEventListener('turbo:load', initializeAll);
+  var dynamicContentObserver = null;
+  var observedBody = null;
+
+  function observeDynamicContent() {
+    if (!window.MutationObserver || !document.body || observedBody === document.body) return;
+
+    if (dynamicContentObserver) dynamicContentObserver.disconnect();
+
+    observedBody = document.body;
+    dynamicContentObserver = new MutationObserver(function (mutations) {
+      var hasNewElements = mutations.some(function (mutation) {
+        return Array.prototype.some.call(mutation.addedNodes, function (node) {
+          return node.nodeType === 1;
+        });
+      });
+
+      if (hasNewElements) initializeAll();
+    });
+
+    dynamicContentObserver.observe(observedBody, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  function boot() {
+    initializeAll();
+    observeDynamicContent();
+  }
+
+  document.addEventListener('DOMContentLoaded', boot);
+  document.addEventListener('turbo:load', boot);
 })();
