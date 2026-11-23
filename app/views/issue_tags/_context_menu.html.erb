@@ -1,0 +1,28 @@
+<% if RedmineIssueTags.database_ready? && issues.present? && can[:edit] && issues.all? { |issue| RedmineIssueTags.can_assign_tags?(User.current, issue.project) } %>
+  <% available_tags = RedmineIssueTags.available_tags_for_issues(issues) %>
+  <% if available_tags.any? %>
+    <% issue_ids = issues.map(&:id).sort %>
+    <% assignment_counts = RedmineIssueTagging.where(issue_id: issue_ids, issue_tag_id: available_tags.map(&:id)).group(:issue_tag_id).count %>
+    <li class="folder">
+      <a href="#" class="submenu"><%= l(:field_issue_tags) %></a>
+      <span class="icon-only"><%= sprite_icon('angle-right', rtl: true) %></span>
+      <ul>
+        <% available_tags.each do |tag| %>
+          <% assigned_to_all = assignment_counts.fetch(tag.id, 0) == issue_ids.size %>
+          <% operation = assigned_to_all ? 'remove' : 'add' %>
+          <% label = assigned_to_all ? sprite_icon('checked', tag.name) : tag.name %>
+          <li>
+            <%= context_menu_link label,
+                                  bulk_update_issues_path(
+                                    ids: issue_ids,
+                                    issue_tag_bulk: {operation: operation, tag_ids: [tag.id]},
+                                    back_url: back
+                                  ),
+                                  method: :patch,
+                                  title: tag.description.to_s %>
+          </li>
+        <% end %>
+      </ul>
+    </li>
+  <% end %>
+<% end %>

@@ -4,6 +4,10 @@ module RedmineIssueTags
               partial: 'issue_tags/issue_form'
     render_on :view_issues_show_details_bottom,
               partial: 'issue_tags/issue_show'
+    render_on :view_issues_bulk_edit_details_bottom,
+              partial: 'issue_tags/bulk_edit'
+    render_on :view_issues_context_menu_start,
+              partial: 'issue_tags/context_menu'
     render_on :view_layouts_base_html_head,
               partial: 'issue_tags/assets'
 
@@ -13,6 +17,27 @@ module RedmineIssueTags
 
     def controller_issues_edit_after_save(context = {})
       persist_tags(context)
+    end
+
+    def controller_issues_bulk_edit_before_save(context = {})
+      return unless RedmineIssueTags.database_ready?
+
+      issue = context[:issue]
+      params = context[:params]
+      return unless issue && params && params[:copy].blank?
+
+      bulk_params = params[:issue_tag_bulk]
+      return unless bulk_params
+
+      operation = bulk_params[:operation].to_s
+      return unless RedmineIssueTags::TAG_CHANGE_OPERATIONS.include?(operation)
+
+      RedmineIssueTags.queue_issue_tag_change!(
+        issue,
+        User.current,
+        bulk_params[:tag_ids],
+        operation: operation
+      )
     end
 
     private
@@ -25,24 +50,12 @@ module RedmineIssueTags
       return unless issue && params && RedmineIssueTags.can_assign_tags?(User.current, issue.project)
       return unless params.key?(:redmine_issue_tag_ids)
 
-      ids = Array(params[:redmine_issue_tag_ids]).map(&:to_i).select(&:positive?).uniq
-      allowed_ids = RedmineIssueTag
-                    .active
-                    .joins(:trackers)
-                    .where(id: ids, trackers: {id: issue.tracker_id})
-                    .pluck(:id)
-      old_names = RedmineIssueTags.tags_for(issue).order(:name).pluck(:name)
-
-      RedmineIssueTagging.transaction do
-        RedmineIssueTagging.where(issue_id: issue.id).where.not(issue_tag_id: allowed_ids).delete_all
-        existing_ids = RedmineIssueTagging.where(issue_id: issue.id, issue_tag_id: allowed_ids).pluck(:issue_tag_id)
-        (allowed_ids - existing_ids).each do |tag_id|
-          RedmineIssueTagging.create!(issue_id: issue.id, issue_tag_id: tag_id, author_id: User.current.id)
-        end
-      end
-
-      new_names = RedmineIssueTags.tags_for(issue).order(:name).pluck(:name)
-      RedmineIssueTags.record_tag_change(issue, User.current, old_names, new_names)
+      RedmineIssueTags.change_issue_tags!(
+        issue,
+        User.current,
+        params[:redmine_issue_tag_ids],
+        operation: :replace
+      )
     end
   end
 end

@@ -1,6 +1,16 @@
-# Redmine Issue Tags 0.5.3
+# Redmine Issue Tags 0.5.4
 
 Plugin de tags pesquisáveis para tarefas, desenvolvido para testes no Redmine 6.0.6.
+
+## Melhorias da versão 0.5.4
+
+- adiciona o campo `Tags` à edição em massa, com operações explícitas para adicionar, remover ou substituir vínculos;
+- permite adicionar e remover tags pelo menu contextual das tarefas exibidas em consultas;
+- aplica a ação a uma ou várias tarefas selecionadas sem apagar outras tags ao usar a operação de adição;
+- limita as opções às tags compatíveis com todos os tipos de tarefa envolvidos;
+- respeita as permissões de edição e de tags e registra cada mudança no histórico da tarefa.
+
+Esta versão não possui nova migração.
 
 ## Correção da versão 0.5.3
 

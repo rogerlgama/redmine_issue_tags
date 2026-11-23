@@ -1,5 +1,13 @@
 # Histórico de versões
 
+## 0.5.4
+
+- Adiciona tags diretamente pelo menu contextual da listagem e dos resultados de consultas de tarefas.
+- Permite alternar uma tag em uma ou várias tarefas selecionadas sem apagar as demais vinculações.
+- Inclui tags na edição em massa com as operações adicionar, remover e substituir.
+- Exibe somente tags compatíveis com todos os tipos das tarefas selecionadas.
+- Mantém as permissões do plugin e registra as alterações em massa no histórico de cada tarefa.
+
 ## 0.5.3
 
 - Reinicializa automaticamente os controles de tags após atualizações dinâmicas do formulário de tarefa.

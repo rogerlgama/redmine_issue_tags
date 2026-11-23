@@ -10,23 +10,7 @@ class IssueTagAssignmentsController < ApplicationController
 
   def update
     ids = Array(params.dig(:tags, :ids)).map(&:to_i).select(&:positive?).uniq
-    valid_ids = RedmineIssueTag
-                .active
-                .joins(:trackers)
-                .where(id: ids, trackers: {id: @issue.tracker_id})
-                .pluck(:id)
-    old_names = RedmineIssueTags.tags_for(@issue).order(:name).pluck(:name)
-
-    RedmineIssueTagging.transaction do
-      RedmineIssueTagging.where(issue_id: @issue.id).where.not(issue_tag_id: valid_ids).delete_all
-      existing_ids = RedmineIssueTagging.where(issue_id: @issue.id, issue_tag_id: valid_ids).pluck(:issue_tag_id)
-      (valid_ids - existing_ids).each do |tag_id|
-        RedmineIssueTagging.create!(issue_id: @issue.id, issue_tag_id: tag_id, author_id: User.current.id)
-      end
-    end
-
-    new_names = RedmineIssueTags.tags_for(@issue).order(:name).pluck(:name)
-    RedmineIssueTags.record_tag_change(@issue, User.current, old_names, new_names)
+    RedmineIssueTags.change_issue_tags!(@issue, User.current, ids, operation: :replace)
     render json: payload
   end
 

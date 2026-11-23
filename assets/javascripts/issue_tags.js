@@ -86,9 +86,30 @@
     });
   }
 
+  function initializeBulkTagEditor(editor) {
+    if (!editor || editor.dataset.initialized === 'true') return;
+    editor.dataset.initialized = 'true';
+
+    var operation = editor.querySelector('.issue-tag-bulk-operation');
+    var checkboxes = Array.prototype.slice.call(editor.querySelectorAll('input[type="checkbox"]'));
+    if (!operation) return;
+
+    function updateState() {
+      var enabled = operation.value !== '';
+      editor.classList.toggle('is-disabled', !enabled);
+      checkboxes.forEach(function (checkbox) {
+        checkbox.disabled = !enabled;
+      });
+    }
+
+    operation.addEventListener('change', updateState);
+    updateState();
+  }
+
   function initializeAll() {
     document.querySelectorAll('.issue-tag-tracker-picker').forEach(initializeTrackerPicker);
     document.querySelectorAll('.issue-tag-role-picker').forEach(initializeRolePicker);
+    document.querySelectorAll('[data-issue-tag-bulk-editor]').forEach(initializeBulkTagEditor);
     document.querySelectorAll('.issue-tag-collaborative').forEach(initializeCollaborativeTag);
     initializeGlobalRoleSettings();
   }

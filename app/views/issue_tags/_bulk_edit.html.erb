@@ -1,0 +1,36 @@
+<% if RedmineIssueTags.database_ready? && !@copy && issues.present? && issues.all?(&:attributes_editable?) && issues.all? { |issue| RedmineIssueTags.can_assign_tags?(User.current, issue.project) } %>
+  <% target_tracker_id = @target_tracker&.id %>
+  <% available_tags = RedmineIssueTags.available_tags_for_issues(issues, target_tracker_id: target_tracker_id) %>
+  <% bulk_tag_params = params[:issue_tag_bulk] || {} %>
+  <% selected_operation = bulk_tag_params[:operation].to_s %>
+  <% selected_tag_ids = Array(bulk_tag_params[:tag_ids]).map(&:to_i) %>
+  <p class="issue-tag-bulk-field">
+    <label for="issue_tag_bulk_operation"><%= l(:field_issue_tags) %></label>
+    <span class="issue-tag-bulk-editor" data-issue-tag-bulk-editor>
+      <%= select_tag 'issue_tag_bulk[operation]',
+                     options_for_select([
+                       [l(:label_no_change_option), ''],
+                       [l(:label_issue_tag_bulk_add), 'add'],
+                       [l(:label_issue_tag_bulk_remove), 'remove'],
+                       [l(:label_issue_tag_bulk_replace), 'replace']
+                     ], selected_operation),
+                     id: 'issue_tag_bulk_operation',
+                     class: 'issue-tag-bulk-operation' %>
+      <%= hidden_field_tag 'issue_tag_bulk[tag_ids][]', '', id: nil %>
+      <span class="issue-tag-checkbox-options issue-tag-bulk-options">
+        <% available_tags.each do |tag| %>
+          <label class="issue-tag-checkbox-option" title="<%= tag.description.to_s %>">
+            <%= check_box_tag 'issue_tag_bulk[tag_ids][]', tag.id,
+                              selected_tag_ids.include?(tag.id),
+                              id: "issue_tag_bulk_tag_ids_#{tag.id}" %>
+            <span><%= tag.name %></span>
+          </label>
+        <% end %>
+        <% if available_tags.empty? %>
+          <span class="nodata"><%= l(:label_issue_tag_bulk_none_available) %></span>
+        <% end %>
+      </span>
+      <em class="info"><%= l(:text_issue_tag_bulk_help) %></em>
+    </span>
+  </p>
+<% end %>

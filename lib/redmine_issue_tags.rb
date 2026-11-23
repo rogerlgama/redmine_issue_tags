@@ -10,6 +10,8 @@ require_relative 'redmine_issue_tags/issue_query_patch'
 require_relative 'redmine_issue_tags/json_builder_patch'
 
 module RedmineIssueTags
+  TAG_CHANGE_OPERATIONS = %w[add remove replace].freeze
+
   def self.database_ready?
     RedmineIssueTag.table_exists? &&
       RedmineIssueTagging.table_exists? &&
@@ -29,6 +31,101 @@ module RedmineIssueTags
     return [] unless database_ready? && issue&.persisted?
 
     RedmineIssueTagging.where(issue_id: issue.id).pluck(:issue_tag_id)
+  end
+
+  def self.available_tags_for_issues(issues, target_tracker_id: nil)
+    return RedmineIssueTag.none unless database_ready?
+
+    tracker_ids = if target_tracker_id.present?
+                    [target_tracker_id.to_i]
+                  else
+                    Array(issues).filter_map(&:tracker_id).map(&:to_i).uniq
+                  end
+    return RedmineIssueTag.none if tracker_ids.empty?
+
+    tag_ids = RedmineIssueTag
+              .active
+              .joins(:trackers)
+              .where(trackers: {id: tracker_ids})
+              .group("#{RedmineIssueTag.table_name}.id")
+              .having('COUNT(DISTINCT trackers.id) = ?', tracker_ids.size)
+              .pluck("#{RedmineIssueTag.table_name}.id")
+
+    RedmineIssueTag.active.where(id: tag_ids).sorted
+  end
+
+  def self.issue_tag_change_plan(issue, requested_ids, operation:)
+    return unless database_ready? && issue&.persisted?
+
+    operation = operation.to_s
+    return unless TAG_CHANGE_OPERATIONS.include?(operation)
+
+    requested_ids = Array(requested_ids).map(&:to_i).select(&:positive?).uniq
+    old_ids = tag_ids_for(issue).map(&:to_i).uniq.sort
+    compatible_ids = compatible_tag_ids(issue.tracker_id, requested_ids)
+
+    new_ids =
+      case operation
+      when 'add'
+        (old_ids | compatible_ids).sort
+      when 'remove'
+        (old_ids - requested_ids).sort
+      when 'replace'
+        compatible_ids.sort
+      end
+
+    return if old_ids == new_ids
+
+    {
+      old_ids: old_ids,
+      new_ids: new_ids,
+      old_names: tag_names_for_ids(old_ids),
+      new_names: tag_names_for_ids(new_ids)
+    }
+  end
+
+  def self.change_issue_tags!(issue, user, requested_ids, operation: :replace)
+    return false unless can_assign_tags?(user, issue&.project)
+
+    change = issue_tag_change_plan(issue, requested_ids, operation: operation)
+    return false unless change
+
+    persist_issue_tag_ids!(issue, user, change[:new_ids])
+    record_tag_change(issue, user, change[:old_names], change[:new_names])
+    true
+  end
+
+  def self.queue_issue_tag_change!(issue, user, requested_ids, operation:)
+    return false unless can_assign_tags?(user, issue&.project)
+
+    change = issue_tag_change_plan(issue, requested_ids, operation: operation)
+    return false unless change
+
+    journal = issue.current_journal || issue.init_journal(user)
+    journal.details.build(
+      property: 'attr',
+      prop_key: 'issue_tags',
+      old_value: change[:old_names].join(', ').presence,
+      value: change[:new_names].join(', ').presence
+    )
+    issue.redmine_issue_tags_pending_change = {
+      tag_ids: change[:new_ids],
+      author_id: user.id
+    }
+    true
+  end
+
+  def self.persist_issue_tag_ids!(issue, user_or_id, tag_ids)
+    desired_ids = Array(tag_ids).map(&:to_i).select(&:positive?).uniq
+    author_id = user_or_id.respond_to?(:id) ? user_or_id.id : user_or_id
+
+    RedmineIssueTagging.transaction do
+      RedmineIssueTagging.where(issue_id: issue.id).where.not(issue_tag_id: desired_ids).delete_all
+      existing_ids = RedmineIssueTagging.where(issue_id: issue.id, issue_tag_id: desired_ids).pluck(:issue_tag_id)
+      (desired_ids - existing_ids).each do |tag_id|
+        RedmineIssueTagging.create!(issue_id: issue.id, issue_tag_id: tag_id, author_id: author_id)
+      end
+    end
   end
 
   def self.inject_tags_into_standard_api!(payload, route_parameters)
@@ -89,6 +186,28 @@ module RedmineIssueTags
 
   def self.can_collaborate_tags?(user, project)
     user.admin? || user.allowed_to?(:collaborate_issue_tags, project)
+  end
+
+  def self.compatible_tag_ids(tracker_id, tag_ids)
+    ids = Array(tag_ids).map(&:to_i).select(&:positive?).uniq
+    return [] if tracker_id.blank? || ids.empty?
+
+    RedmineIssueTag
+      .active
+      .joins(:trackers)
+      .where(id: ids, trackers: {id: tracker_id})
+      .distinct
+      .pluck("#{RedmineIssueTag.table_name}.id")
+  end
+
+  def self.tag_names_for_ids(tag_ids)
+    ids = Array(tag_ids).map(&:to_i).select(&:positive?).uniq
+    return [] if ids.empty?
+
+    RedmineIssueTag
+      .where(id: ids)
+      .reorder(Arel.sql('LOWER(redmine_issue_tags.name) ASC'))
+      .pluck(:name)
   end
 
   def self.record_tag_change(issue, user, old_names, new_names)
