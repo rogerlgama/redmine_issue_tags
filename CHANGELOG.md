@@ -1,5 +1,13 @@
 # Histórico de versões
 
+## 0.5.5
+
+- Mantém `Editar` ou `Edição em massa` como primeira ação do menu contextual de tarefas.
+- Alinha visualmente as tags já selecionadas às demais opções dos submenus nativos do Redmine.
+- Adiciona pesquisa parcial, sem diferenciação de maiúsculas, minúsculas ou acentos, ao seletor de tags das tarefas.
+- Libera os endpoints de consulta do plugin para usuários não administradores autenticados pela API.
+- Mantém a visibilidade das tarefas e as contagens vinculadas limitadas às permissões do usuário autenticado.
+
 ## 0.5.4
 
 - Adiciona tags diretamente pelo menu contextual da listagem e dos resultados de consultas de tarefas.

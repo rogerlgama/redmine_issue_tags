@@ -29,6 +29,7 @@ pt-BR:
   error_issue_tag_collaborative_create: "Não foi possível criar a tag."
   text_issue_tag_collaborative_limits: "Na edição colaborativa é permitido alterar Nome, Descrição e Cor. Tipos de tarefa e deleções são restritos aos administradores."
   text_issue_tags_select_help: "Marque ou desmarque as tags desejadas."
+  label_issue_tag_search_tags: "Pesquisar tags..."
   label_issue_tag_bulk_add: "Adicionar tags selecionadas"
   label_issue_tag_bulk_remove: "Remover tags selecionadas"
   label_issue_tag_bulk_replace: "Substituir pelas tags selecionadas"

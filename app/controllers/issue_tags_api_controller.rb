@@ -1,6 +1,6 @@
 class IssueTagsApiController < ApplicationController
   accept_api_auth :index, :show, :issues, :issue_tags, :roles
-  before_action :require_admin
+  before_action :require_login
   before_action :ensure_plugin_database
   before_action :find_tag, only: [:show, :issues]
   before_action :find_issue, only: :issue_tags
@@ -86,7 +86,7 @@ class IssueTagsApiController < ApplicationController
   def tag_payload(tag)
     basic_tag_payload(tag).merge(
       trackers: tag.trackers.sort_by(&:position).map {|tracker| {id: tracker.id, name: tracker.name}},
-      issues_count: tag.taggings.size,
+      issues_count: visible_issue_counts.fetch(tag.id, 0),
       created_on: tag.created_at,
       updated_on: tag.updated_at
     )
@@ -112,6 +112,13 @@ class IssueTagsApiController < ApplicationController
       created_on: issue.created_on,
       updated_on: issue.updated_on
     }
+  end
+
+  def visible_issue_counts
+    @visible_issue_counts ||= RedmineIssueTagging
+                              .where(issue_id: Issue.visible.select(:id))
+                              .group(:issue_tag_id)
+                              .count
   end
 
   def api_limit

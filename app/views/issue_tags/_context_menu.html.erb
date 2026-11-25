@@ -3,7 +3,7 @@
   <% if available_tags.any? %>
     <% issue_ids = issues.map(&:id).sort %>
     <% assignment_counts = RedmineIssueTagging.where(issue_id: issue_ids, issue_tag_id: available_tags.map(&:id)).group(:issue_tag_id).count %>
-    <li class="folder">
+    <li class="folder issue-tag-context-menu">
       <a href="#" class="submenu"><%= l(:field_issue_tags) %></a>
       <span class="icon-only"><%= sprite_icon('angle-right', rtl: true) %></span>
       <ul>
@@ -19,6 +19,7 @@
                                     back_url: back
                                   ),
                                   method: :patch,
+                                  class: (assigned_to_all ? 'icon' : nil),
                                   title: tag.description.to_s %>
           </li>
         <% end %>

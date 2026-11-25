@@ -4,18 +4,27 @@
     <label><%= l(:field_issue_tags) %></label>
     <%= hidden_field_tag 'redmine_issue_tag_ids[]', '' %>
     <% available_tags = RedmineIssueTag.active.joins(:trackers).where(trackers: {id: @issue.tracker_id}).sorted %>
-    <span id="redmine_issue_tag_options" class="issue-tag-checkbox-options">
-      <% available_tags.each do |tag| %>
-        <label class="issue-tag-checkbox-option"
-               data-issue-tag-id="<%= tag.id %>"
-               title="<%= tag.description.presence %>">
-          <%= check_box_tag 'redmine_issue_tag_ids[]',
-                            tag.id,
-                            selected_ids.include?(tag.id.to_s),
-                            id: "redmine_issue_tag_ids_#{tag.id}" %>
-          <span><%= tag.name %></span>
-        </label>
-      <% end %>
+    <span class="issue-tag-picker" data-issue-tag-picker>
+      <input type="search"
+             class="issue-tag-search"
+             placeholder="<%= l(:label_issue_tag_search_tags) %>"
+             aria-label="<%= l(:label_issue_tag_search_tags) %>"
+             autocomplete="off">
+      <span id="redmine_issue_tag_options" class="issue-tag-checkbox-options">
+        <% available_tags.each do |tag| %>
+          <label class="issue-tag-checkbox-option"
+                 data-issue-tag-id="<%= tag.id %>"
+                 data-search-name="<%= tag.name %>"
+                 title="<%= tag.description.presence %>">
+            <%= check_box_tag 'redmine_issue_tag_ids[]',
+                              tag.id,
+                              selected_ids.include?(tag.id.to_s),
+                              id: "redmine_issue_tag_ids_#{tag.id}" %>
+            <span><%= tag.name %></span>
+          </label>
+        <% end %>
+        <span class="issue-tag-no-results"><%= l(:label_no_data) %></span>
+      </span>
     </span>
     <em class="info"><%= l(:text_issue_tags_select_help) %></em>
   </p>

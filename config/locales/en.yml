@@ -29,6 +29,7 @@ en:
   error_issue_tag_collaborative_create: "The tag could not be created."
   text_issue_tag_collaborative_limits: "Collaborative editing can change the name, description, and color. Issue types and deletion are restricted to administrators."
   text_issue_tags_select_help: "Select or clear the desired tags."
+  label_issue_tag_search_tags: "Search tags..."
   label_issue_tag_bulk_add: "Add selected tags"
   label_issue_tag_bulk_remove: "Remove selected tags"
   label_issue_tag_bulk_replace: "Replace with selected tags"

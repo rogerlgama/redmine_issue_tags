@@ -25,6 +25,26 @@
 .issue-tags-display .label { font-weight: bold; margin-right: 6px; }
 #issue-tags-field .info { display: block; margin-left: 180px; }
 
+.issue-tag-picker {
+  display: inline-block;
+  box-sizing: border-box;
+  width: min(520px, calc(100% - 190px));
+  min-width: 280px;
+  vertical-align: top;
+}
+
+.issue-tag-search {
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.issue-tag-picker .issue-tag-checkbox-options {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 .issue-tag-checkbox-options {
   display: inline-block;
   box-sizing: border-box;
@@ -53,6 +73,8 @@
 
 .issue-tag-checkbox-option:hover { background: #f3f6f8; }
 .issue-tag-checkbox-option input { margin: 0; }
+.issue-tag-checkbox-option.issue-tag-filtered-out { display: none !important; }
+.issue-tag-no-results { display: none; padding: 8px; color: #777; }
 
 .issue-tag-bulk-editor {
   display: inline-block;
@@ -197,6 +219,10 @@
 
 @media screen and (max-width: 499px) {
   .issue-tag-checkbox-options {
+    width: 100%;
+    min-width: 0;
+  }
+  .issue-tag-picker {
     width: 100%;
     min-width: 0;
   }

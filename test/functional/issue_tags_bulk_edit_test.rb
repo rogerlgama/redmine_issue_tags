@@ -12,9 +12,38 @@ class IssueTagsContextMenuTest < Redmine::ControllerTest
 
     assert_response :success
     assert_select 'li.folder > a.submenu', text: I18n.t(:field_issue_tags)
+    assert_select 'li.issue-tag-context-menu', count: 1
+    assert_select 'ul > li:first-child > a', text: I18n.t(:button_edit)
     assert_select 'a[data-method="patch"]', text: tag.name do |links|
       assert_includes links.first['href'], 'issue_tag_bulk%5Boperation%5D=add'
       assert_includes links.first['href'], "issue_tag_bulk%5Btag_ids%5D%5B%5D=#{tag.id}"
+    end
+  end
+
+  test 'keeps bulk edit as the first context menu item' do
+    issues = Issue.where(id: [1, 2]).to_a
+    RedmineIssueTag.create!(name: 'Contexto em massa', trackers: issues.map(&:tracker).uniq)
+    @request.session[:user_id] = 1
+
+    get :issues, params: {ids: issues.map(&:id)}
+
+    assert_response :success
+    assert_select 'ul > li:first-child > a', text: I18n.t(:label_bulk_edit)
+    assert_select 'li.folder > a.submenu', text: I18n.t(:field_issue_tags)
+  end
+
+  test 'aligns an assigned tag with native context menu choices while keeping it removable' do
+    issue = Issue.find(1)
+    tag = RedmineIssueTag.create!(name: 'Já selecionada', trackers: [issue.tracker])
+    RedmineIssueTagging.create!(issue: issue, tag: tag, author: User.find(1))
+    @request.session[:user_id] = 1
+
+    get :issues, params: {ids: [issue.id]}
+
+    assert_response :success
+    assert_select 'a.icon[data-method="patch"]', text: tag.name do |links|
+      assert_includes links.first['href'], 'issue_tag_bulk%5Boperation%5D=remove'
+      assert_not_equal '#', links.first['href']
     end
   end
 end
@@ -58,6 +87,24 @@ class IssueTagsBulkEditTest < Redmine::ControllerTest
     assert RedmineIssueTagging.exists?(issue_id: issues.first.id, issue_tag_id: existing_tag.id)
     issues.each do |issue|
       assert issue.journals.joins(:details).exists?(journal_details: {prop_key: 'issue_tags'})
+    end
+  end
+end
+
+class IssueTagsIssueFormTest < Redmine::ControllerTest
+  tests IssuesController
+
+  test 'renders a searchable tag picker in the issue form' do
+    issue = Issue.find(1)
+    tag = RedmineIssueTag.create!(name: 'Arquitetura distribuída', trackers: [issue.tracker])
+    @request.session[:user_id] = 1
+
+    get :edit, params: {id: issue.id}
+
+    assert_response :success
+    assert_select '[data-issue-tag-picker]' do
+      assert_select 'input.issue-tag-search[placeholder=?]', I18n.t(:label_issue_tag_search_tags)
+      assert_select ".issue-tag-checkbox-option[data-search-name='#{tag.name}']"
     end
   end
 end

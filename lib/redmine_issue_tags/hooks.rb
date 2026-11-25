@@ -6,7 +6,7 @@ module RedmineIssueTags
               partial: 'issue_tags/issue_show'
     render_on :view_issues_bulk_edit_details_bottom,
               partial: 'issue_tags/bulk_edit'
-    render_on :view_issues_context_menu_start,
+    render_on :view_issues_context_menu_end,
               partial: 'issue_tags/context_menu'
     render_on :view_layouts_base_html_head,
               partial: 'issue_tags/assets'

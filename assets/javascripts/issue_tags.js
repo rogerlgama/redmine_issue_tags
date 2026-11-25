@@ -86,6 +86,37 @@
     });
   }
 
+  function initializeTagPicker(picker) {
+    if (!picker || picker.dataset.initialized === 'true') return;
+    picker.dataset.initialized = 'true';
+
+    var search = picker.querySelector('.issue-tag-search');
+    var optionsContainer = picker.querySelector('.issue-tag-checkbox-options');
+    var noResults = picker.querySelector('.issue-tag-no-results');
+    if (!search || !optionsContainer || !noResults) return;
+
+    function options() {
+      return Array.prototype.slice.call(optionsContainer.querySelectorAll('.issue-tag-checkbox-option'));
+    }
+
+    function filterOptions() {
+      var term = normalize(search.value);
+      var visible = 0;
+
+      options().forEach(function (option) {
+        var matches = normalize(option.dataset.searchName).indexOf(term) !== -1;
+        option.classList.toggle('issue-tag-filtered-out', !matches);
+        if (matches) visible += 1;
+      });
+
+      noResults.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    search.addEventListener('input', filterOptions);
+    picker.issueTagFilterOptions = filterOptions;
+    filterOptions();
+  }
+
   function initializeBulkTagEditor(editor) {
     if (!editor || editor.dataset.initialized === 'true') return;
     editor.dataset.initialized = 'true';
@@ -106,10 +137,23 @@
     updateState();
   }
 
+  function positionTagContextMenu(item) {
+    if (!item || item.dataset.positioned === 'true') return;
+
+    var menu = item.parentElement;
+    var firstItem = menu && menu.firstElementChild;
+    if (!menu || !firstItem || firstItem === item) return;
+
+    firstItem.insertAdjacentElement('afterend', item);
+    item.dataset.positioned = 'true';
+  }
+
   function initializeAll() {
     document.querySelectorAll('.issue-tag-tracker-picker').forEach(initializeTrackerPicker);
     document.querySelectorAll('.issue-tag-role-picker').forEach(initializeRolePicker);
+    document.querySelectorAll('[data-issue-tag-picker]').forEach(initializeTagPicker);
     document.querySelectorAll('[data-issue-tag-bulk-editor]').forEach(initializeBulkTagEditor);
+    document.querySelectorAll('.issue-tag-context-menu').forEach(positionTagContextMenu);
     document.querySelectorAll('.issue-tag-collaborative').forEach(initializeCollaborativeTag);
     initializeGlobalRoleSettings();
   }
@@ -162,6 +206,7 @@
       var label = document.createElement('label');
       label.className = 'issue-tag-checkbox-option';
       label.dataset.issueTagId = tag.id;
+      label.dataset.searchName = tag.name;
       label.title = tag.description || '';
 
       var checkbox = document.createElement('input');
@@ -177,6 +222,9 @@
       label.appendChild(checkbox);
       label.appendChild(text);
       options.appendChild(label);
+
+      var picker = options.closest('[data-issue-tag-picker]');
+      if (picker && picker.issueTagFilterOptions) picker.issueTagFilterOptions();
     }
 
     function closeForm() {

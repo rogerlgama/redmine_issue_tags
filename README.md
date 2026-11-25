@@ -7,7 +7,7 @@ Portuguese documentation: [README.pt-BR.md](README.pt-BR.md)
 ## Features
 
 - Global administrative tag catalog with name, description, color, and allowed trackers.
-- Independent checkbox selection for assigning multiple tags to an issue.
+- Searchable independent checkbox selection for assigning multiple tags to an issue.
 - Tag assignment from issue-list context menus and bulk editing, with add, remove, and replace operations.
 - Clickable colored tag badges on issue pages and in the administration list.
 - Tag descriptions displayed as tooltips.
@@ -15,7 +15,7 @@ Portuguese documentation: [README.pt-BR.md](README.pt-BR.md)
 - Structured issue history for tag additions and removals.
 - Role permissions for assigning existing tags and collaboratively creating or editing tags.
 - Searchable role and tracker selectors without external JavaScript dependencies.
-- Administrative JSON API for tags, linked issues, and role permissions.
+- Authenticated JSON API for tags, visible linked issues, and role permissions.
 - Automatic `issue_tags` data in Redmine's standard issue JSON API.
 - Compatibility handling for MySQL, PostgreSQL, and SQLite.
 
@@ -50,7 +50,7 @@ The plugin was developed and validated for Redmine 6.0.6.
 3. Run the migration command shown above.
 4. Restart Redmine.
 
-Version 0.5.4 does not add a new migration. Installations upgrading from versions older than 0.4.11 must still run all pending plugin migrations.
+Version 0.5.5 does not add a new migration. Installations upgrading from versions older than 0.4.11 must still run all pending plugin migrations.
 
 ## Permissions
 
@@ -88,7 +88,7 @@ Issues without tags return an empty `issue_tags` array.
 
 ## Plugin API
 
-The administrative endpoints require an administrator API key:
+The plugin endpoints require an authenticated active user and accept administrator or non-administrator API keys:
 
 ```text
 GET /api/issue_tags/tags.json
@@ -122,6 +122,8 @@ Example request body for replacing all tags assigned to an issue:
 ```
 
 API authentication can use Redmine's standard `X-Redmine-API-Key` header.
+
+Issue lists and linked-issue counts are restricted to issues visible to the authenticated user. Catalog administration and permission changes remain exclusive to Redmine administrators.
 
 ## Tests
 

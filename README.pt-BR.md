@@ -1,6 +1,17 @@
-# Redmine Issue Tags 0.5.4
+# Redmine Issue Tags 0.5.5
 
 Plugin de tags pesquisáveis para tarefas, desenvolvido para testes no Redmine 6.0.6.
+
+## Melhorias da versão 0.5.5
+
+- preserva `Editar` ou `Edição em massa` como primeira ação do menu contextual;
+- mantém as tags já selecionadas alinhadas visualmente às demais opções nativas do Redmine;
+- adiciona pesquisa por parte do nome no seletor de tags da criação e edição de tarefas;
+- permite pesquisas sem diferenciação entre maiúsculas, minúsculas ou acentos;
+- libera os endpoints de consulta do plugin para usuários não administradores autenticados pela API;
+- respeita a visibilidade de tarefas do usuário ao retornar vínculos e quantitativos.
+
+Esta versão não possui nova migração.
 
 ## Melhorias da versão 0.5.4
 
@@ -298,7 +309,7 @@ Exemplo do trecho acrescentado a cada tarefa:
 ]
 ```
 
-Os endpoints administrativos específicos do plugin permanecem disponíveis e exigem que a chave pertença a um administrador:
+Os endpoints específicos do plugin ficam disponíveis para usuários administradores e não administradores autenticados por uma chave de API válida:
 
 ```http
 GET /api/issue_tags/tags.json
@@ -307,6 +318,8 @@ GET /api/issue_tags/tags/:id/issues.json
 GET /api/issue_tags/issues/:issue_id/tags.json
 GET /api/issue_tags/roles.json
 ```
+
+As tarefas e os quantitativos vinculados retornados pela API respeitam a visibilidade do usuário autenticado. A administração do catálogo e a alteração das permissões permanecem exclusivas dos administradores.
 
 A consulta das tarefas vinculadas aceita `limit` e `offset`:
 
@@ -338,9 +351,7 @@ Content-Type: application/json
 ## Limitações conhecidas da versão inicial
 
 - o filtro `=` corresponde a qualquer uma das tags selecionadas;
-- a edição em massa específica para adicionar/remover tags será incluída em uma versão posterior;
-- tags são globais nesta versão;
-- a API de listagem do catálogo está, por segurança, restrita a administradores.
+- tags são globais nesta versão.
 
 ## Licença
 

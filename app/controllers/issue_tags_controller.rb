@@ -1,7 +1,8 @@
 class IssueTagsController < ApplicationController
   layout 'admin'
   accept_api_auth :index
-  before_action :require_admin
+  before_action :authorize_index_access, only: :index
+  before_action :require_admin, except: :index
   before_action :ensure_plugin_database
   before_action :find_tag, only: [:edit, :update, :destroy]
 
@@ -72,6 +73,10 @@ class IssueTagsController < ApplicationController
 
   private
 
+  def authorize_index_access
+    api_request? ? require_login : require_admin
+  end
+
   def ensure_plugin_database
     return if RedmineIssueTags.database_ready?
 
@@ -106,7 +111,14 @@ class IssueTagsController < ApplicationController
       color: tag.color,
       description: tag.description,
       trackers: tag.trackers.order(:position).map { |tracker| {id: tracker.id, name: tracker.name} },
-      issues_count: tag.taggings.size
+      issues_count: visible_issue_counts.fetch(tag.id, 0)
     }
+  end
+
+  def visible_issue_counts
+    @visible_issue_counts ||= RedmineIssueTagging
+                              .where(issue_id: Issue.visible.select(:id))
+                              .group(:issue_tag_id)
+                              .count
   end
 end
